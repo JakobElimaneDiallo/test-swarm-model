@@ -84,22 +84,22 @@ class SimpleRobot:
         dx = step_size * np.cos(self.direction)
         dy = step_size * np.sin(self.direction)
         
-        # We gebruiken step_size als delta per update, dus geen extra dt-scaling
+        # Using step_size as delta per update, no extra dt-scaling needed
 
-        # Probeer richting maximaal 8 keer te herrollen als we buiten de arena komen
+        # Try changing direction up to 8 times if we would go outside the arena
         attempts = 0
         while attempts < 8:
             next_x = self.x + dx
             next_y = self.y + dy
             if 0 <= next_x <= 1 and 0 <= next_y <= 1:
-                break  # geldige stap
-            # Kies nieuwe willekeurige richting en probeer opnieuw
+                break  # valid step
+            # Choose a new random direction and try again
             self.turnRandomAngle()
             dx = step_size * np.cos(self.direction)
             dy = step_size * np.sin(self.direction)
             attempts += 1
         else:
-            # Na 8 pogingen nog steeds buiten -> blijf staan maar draai
+            # After 8 attempts still outside -> stay in place but rotate
             self.turnRandomAngle()
             return
             
@@ -248,8 +248,8 @@ class SimpleRobot:
     def check_decision(self):
         # Re-evaluate decision whenever we have enough (possibly correlated) samples.
         #   belief  = P(f < 0.5)
-        #   high belief  -> zeker dat  f < 0.5   (niet-vibrerend merendeel)
-        #   low  belief  -> zeker dat  f > 0.5   (wel-vibrerend merendeel)
+        #   high belief  -> confident that f < 0.5   (non-vibrating majority)
+        #   low  belief  -> confident that f > 0.5   (vibrating majority)
         if (self.sends + self.recvs) >= self.min_swarm_count:
             belief = beta_dist.cdf(0.5, self.alpha, self.beta)
             if belief > self.p_c:
@@ -257,7 +257,7 @@ class SimpleRobot:
             elif belief < (1 - self.p_c):
                 self.decision_flag = 0  # confident: vibrating majority
             else:
-                # Onzekerheid terug > (1-p_c) : trek beslissing weer in.
+                # Uncertainty back above (1-p_c): withdraw decision.
                 self.decision_flag = -1
                 
     def get_belief_confidence(self):
