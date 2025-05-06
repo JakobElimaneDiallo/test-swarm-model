@@ -115,19 +115,19 @@ def main():
 
     try:
         # Run simulation until any robot has made a decision
-        print("\nSimulation loopt totdat één robot een besluit heeft genomen...")
+        print("\nSimulation running until at least one robot makes a decision...")
         frame = 0
         while not any(robot.decision_flag != -1 for robot in robots):
             update_sim(frame)
-            plt.pause(0.1)  # Houd animatie actief
+            plt.pause(0.1)  # Keep animation active
             frame += 1
         deciding_robots = [r.robot_id for r in robots if r.decision_flag != -1]
-        print(f"\nRobot(s) {deciding_robots} hebben een besluit genomen!")
+        print(f"\nRobot(s) {deciding_robots} have made a decision!")
         # Print belief of all robots
         for r in robots:
             belief_conf = beta_dist.cdf(0.5, r.alpha, r.beta)
             belief_mean = r.alpha / (r.alpha + r.beta)
-            verdict = ">50% oppervlak vibreert" if r.decision_flag == 0 else "<=50% oppervlak vibreert"
+            verdict = ">50% of area is vibrating" if r.decision_flag == 0 else "<=50% of area is vibrating"
             print(f"Robot {r.robot_id}: belief_conf={belief_conf:.3f}, mean={belief_mean:.3f}, sends={r.sends}, recvs={r.recvs}, verdict={verdict}")
         plt.show()
         
